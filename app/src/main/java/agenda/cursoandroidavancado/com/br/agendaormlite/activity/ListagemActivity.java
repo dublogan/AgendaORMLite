@@ -5,7 +5,9 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import java.sql.SQLException;
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import agenda.cursoandroidavancado.com.br.agendaormlite.R;
+import agenda.cursoandroidavancado.com.br.agendaormlite.activity.helper.FormularioHelper;
 import agenda.cursoandroidavancado.com.br.agendaormlite.activity.model.bean.Contato;
 import agenda.cursoandroidavancado.com.br.agendaormlite.activity.model.dao.ContatoDAO;
 
@@ -23,6 +26,9 @@ public class ListagemActivity extends ActionBarActivity {
 
     private final String TAG = ActionBarActivity.class
             .getSimpleName();
+    private ArrayAdapter<String> adapter = null;
+
+    private FormularioHelper formularioHelper = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,12 +37,35 @@ public class ListagemActivity extends ActionBarActivity {
 
         int adapterLayout = android.R.layout.simple_list_item_1;
 
-        ArrayAdapter<String> adapter = null;
+        /* Retirado para atualizar o onCreate com
+        * FormularioHelper -> ArrayAdapter<String> adapter = null;*/
 
+        // ListView que exibirá os dados do Contato
         ListView lvListagem = (ListView) findViewById(R.id.lvListagem);
         carregarLista();
         adapter = new ArrayAdapter<String>(this, adapterLayout, listaDeContatos);
         lvListagem.setAdapter(adapter);
+
+        //Implementado depois
+        formularioHelper = new FormularioHelper(this);
+
+        Button botaoSalvar = (Button) findViewById(R.id.button_salvar);
+        botaoSalvar.setOnClickListener((new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ContatoDAO dao = new ContatoDAO(ListagemActivity.this);
+                try {
+                    dao.cadastrar(formularioHelper.getContato());
+                    carregarLista();
+                    adapter.notifyDataSetChanged();
+                    formularioHelper.setContato(new Contato());
+                } catch (SQLException e) {
+                    Log.e(TAG, "Falha ao salvar Contato");
+                } finally {
+                    dao.close();
+                }
+            }
+        }));
     }
     /*Método que solicita serviço da camada de modelo
     *e atualiza a lista de contatos exibida

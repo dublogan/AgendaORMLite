@@ -2,7 +2,13 @@
 <resources>
 
     <string name="app_name">AgendaORMLite</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+
+    //Aplicação Agenda
+    <string name="hint_nome">Nome</string>
+    <string name="hint_telefone">Telefone</string>
+    <string name="hint_email">Email</string>
+    <string name="button_salvar">Salvar</string>
+    <string name="listaDeContato">Lista de Contatos</string>
 
 </resources>
