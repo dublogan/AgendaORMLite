@@ -10,5 +10,6 @@
     <string name="hint_email">Email</string>
     <string name="button_salvar">Salvar</string>
     <string name="listaDeContato">Lista de Contatos</string>
+    <string name="deletar">Deletar Contato</string>
 
 </resources>

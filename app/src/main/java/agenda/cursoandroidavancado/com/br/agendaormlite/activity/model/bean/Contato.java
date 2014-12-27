@@ -7,7 +7,7 @@ import com.j256.ormlite.table.DatabaseTable;
  * Created by Robert on 27/12/2014.
  */
 @DatabaseTable
-public class Contato {
+public class Contato implements IEntidade {
     @DatabaseField(generatedId = true)
     private Long id;
     @DatabaseField

@@ -2,7 +2,7 @@ package agenda.cursoandroidavancado.com.br.agendaormlite.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -10,7 +10,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +41,7 @@ public class ListagemActivity extends ActionBarActivity {
 
         // ListView que exibirá os dados do Contato
         ListView lvListagem = (ListView) findViewById(R.id.lvListagem);
+
         carregarLista();
         adapter = new ArrayAdapter<String>(this, adapterLayout, listaDeContatos);
         lvListagem.setAdapter(adapter);
@@ -50,23 +50,21 @@ public class ListagemActivity extends ActionBarActivity {
         formularioHelper = new FormularioHelper(this);
 
         Button botaoSalvar = (Button) findViewById(R.id.button_salvar);
-        botaoSalvar.setOnClickListener((new View.OnClickListener() {
+        botaoSalvar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ContatoDAO dao = new ContatoDAO(ListagemActivity.this);
-                try {
-                    dao.cadastrar(formularioHelper.getContato());
-                    carregarLista();
-                    adapter.notifyDataSetChanged();
-                    formularioHelper.setContato(new Contato());
-                } catch (SQLException e) {
-                    Log.e(TAG, "Falha ao salvar Contato");
-                } finally {
-                    dao.close();
-                }
+                ContatoDAO dao = ContatoDAO.getInstance();
+                dao.createOrUpdate(formularioHelper.getContato());
+                carregarLista();
+                adapter.notifyDataSetChanged();
+                formularioHelper.setContato(new Contato());
             }
-        }));
+        });
     }
+
+    ;
+
+
     /*Método que solicita serviço da camada de modelo
     *e atualiza a lista de contatos exibida
      */
@@ -74,23 +72,20 @@ public class ListagemActivity extends ActionBarActivity {
         //Limpa a coleção de contatos exibidos
         listaDeContatos.clear();
         //Criação do objeto de persistência
-        ContatoDAO dao = new ContatoDAO(this);
+        ContatoDAO dao = ContatoDAO.getInstance();
         List<Contato> lista = null;
-        try {
-            //Solicitação de serviço da camada MODEL
-            lista = dao.listar();
-        } catch (SQLException e) {
-            //Tratamento da exceção lançada pela MODEL
-            Log.e(TAG, "Falha ao carregar lista");
-        }
+        lista = dao.findAll();
         //Preenchimento da Lista de Contatos
         for (Contato contato : lista) {
             listaDeContatos.add(contato.toString());
         }
-        //Encerramento da conexão
-        dao.close();
     }
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getMenuInflater().inflate(R.menu.menu_contexto, menu);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
